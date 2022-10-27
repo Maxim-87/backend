@@ -4,6 +4,16 @@ import express from 'express';
 const app = express();
 const port = 3000;
 
+const HTTP_STATUSES = {
+  OK_200: 200,
+  CREATED_201: 201,
+  NO_CONTENT_204: 204,
+
+  BAD_REQUEST_400: 400,
+  NOT_FOUND_404: 404,
+
+}
+
 const jsonBody = express.json();
 app.use(jsonBody)
 
@@ -26,7 +36,7 @@ app.get('/address', (req, res) => {
     const foundCity = cities.filter(city => city.title === req.query.title)
     console.log(foundCity)
     if (!foundCity || foundCity.length === 0) {
-      res.sendStatus(404)
+      res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
     else {
       res.json(foundCity)
@@ -41,7 +51,7 @@ app.get('/address', (req, res) => {
 app.post('/address', (req,res) => {
   if (!req.body.title) {
     // res.json('title is required')
-    res.status(201).json('title is required')
+    res.status(HTTP_STATUSES.CREATED_201).json('title is required')
     return;
   }
   else {
@@ -62,22 +72,35 @@ app.get('/address/:id', (req, res) => {
     return;
   }
   else {
-    res.sendStatus(404)
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
   }
 })
 
-app.get('/users', (req, res) => {
-  const a = 4;
-  if (a > 5) {
-    res.send('User empty!!!!!')
+app.put('/address/:id', (req, res) => {
+  const findCity = cities.find(city => city.id === +req.params.id)
 
-  } else {
-    res.send('Get users!!!!!')
+  if(findCity) {
+    console.log(findCity)
+    console.log(req.body.title)
+    findCity.title = req.body.title
+    res.json(findCity)
+    return;
+  }
+  else {
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
   }
 })
 
-app.post('/users', (req, res) => {
-  res.send('Create user')
+app.delete('/address/:id', (req, res) => {
+  const findCity = cities.filter(city => city.id !== +req.params.id)
+
+  if(findCity) {
+    res.status(HTTP_STATUSES.OK_200).json(findCity)
+    return;
+  }
+  else {
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+  }
 })
 
 app.listen(port, () => {
