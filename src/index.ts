@@ -1,5 +1,5 @@
 // const express = require('express')
-import express from 'express';
+import express, {Request, Response} from 'express';
 
 export const app = express();
 const port = 3000;
@@ -17,22 +17,25 @@ export const HTTP_STATUSES = {
 const jsonBody = express.json();
 app.use(jsonBody)
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res) => {
   // res.send({message: 'Hello world'})
   // res.json({message: 'Hello world'}) // better use method json
   // res.json(1500) // better use method json
   res.sendStatus(500) // better use method json
 })
 
-let cities = [
+let cities: Array<CitiesType> = [
   {id: 1, title: 'Moscow'},
   {id: 2, title: 'London'},
   {id: 3, title: 'New York'},
   {id: 4, title: 'Astana'},
 ]
+type CitiesType = {
+  id: number,
+  title: string
+}
 
-
-app.get('/address', (req, res) => {
+app.get('/address', (req: Request<{},{},{},{title: string}>, res: Response<Array<CitiesType>>) => {
   if (req.query.title) {
     const foundCity = cities.filter(city => city.title === req.query.title)
     console.log(foundCity)
@@ -77,7 +80,7 @@ app.get('/address/:id', (req, res) => {
   }
 })
 
-app.put('/address/:id', (req, res) => {
+app.put('/address/:id', (req: Request<{id: string}>, res: Response<CitiesType>) => {
   const findCity = cities.find(city => city.id === +req.params.id)
 
   if(findCity) {
