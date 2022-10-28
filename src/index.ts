@@ -1,10 +1,10 @@
 // const express = require('express')
 import express from 'express';
 
-const app = express();
+export const app = express();
 const port = 3000;
 
-const HTTP_STATUSES = {
+export const HTTP_STATUSES = {
   OK_200: 200,
   CREATED_201: 201,
   NO_CONTENT_204: 204,
@@ -24,12 +24,13 @@ app.get('/', (req, res) => {
   res.sendStatus(500) // better use method json
 })
 
-const cities = [
+let cities = [
   {id: 1, title: 'Moscow'},
   {id: 2, title: 'London'},
   {id: 3, title: 'New York'},
   {id: 4, title: 'Astana'},
 ]
+
 
 app.get('/address', (req, res) => {
   if (req.query.title) {
@@ -43,7 +44,7 @@ app.get('/address', (req, res) => {
     }
   }
   else {
-    res.json(cities)
+    res.status(HTTP_STATUSES.OK_200).json(cities)
   }
 
 })
@@ -51,7 +52,7 @@ app.get('/address', (req, res) => {
 app.post('/address', (req,res) => {
   if (!req.body.title) {
     // res.json('title is required')
-    res.status(HTTP_STATUSES.CREATED_201).json('title is required')
+    res.status(HTTP_STATUSES.NOT_FOUND_404).json('title is required')
     return;
   }
   else {
@@ -102,6 +103,12 @@ app.delete('/address/:id', (req, res) => {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
   }
 })
+
+app.delete('/__test__/data', (req, res) => {
+  cities = []
+  res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+})
+
 
 app.listen(port, () => {
   console.log(`Example app listening ${port}`)
